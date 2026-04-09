@@ -50,6 +50,8 @@ export interface StyleState {
   underline: { isActive: boolean };
   strikethrough: { isActive: boolean };
   link: { isActive: boolean };
+  unorderedList: { isActive: boolean };
+  orderedList: { isActive: boolean };
 }
 
 export interface ContextMenuItem {
@@ -75,6 +77,8 @@ export interface EnrichedMarkdownInputInstance {
   toggleItalic: () => void;
   toggleUnderline: () => void;
   toggleStrikethrough: () => void;
+  toggleUnorderedList: () => void;
+  toggleOrderedList: () => void;
   setLink: (url: string) => void;
   insertLink: (text: string, url: string) => void;
   removeLink: () => void;
@@ -205,6 +209,8 @@ export const EnrichedMarkdownInput = ({
 
   const handleChangeMarkdown = useCallback(
     (e: NativeSyntheticEvent<OnChangeMarkdownEvent>) => {
+      // Auto-continue lists is implemented on the native side (iOS/Android)
+      // The native code detects new lines and auto-inserts list markers
       onChangeMarkdown?.(e.nativeEvent.value);
     },
     [onChangeMarkdown]
@@ -220,8 +226,24 @@ export const EnrichedMarkdownInput = ({
 
   const handleChangeState = useCallback(
     (e: NativeSyntheticEvent<OnChangeStateEvent>) => {
-      const { bold, italic, underline, strikethrough, link } = e.nativeEvent;
-      onChangeState?.({ bold, italic, underline, strikethrough, link });
+      const {
+        bold,
+        italic,
+        underline,
+        strikethrough,
+        link,
+        unorderedList,
+        orderedList,
+      } = e.nativeEvent;
+      onChangeState?.({
+        bold,
+        italic,
+        underline,
+        strikethrough,
+        link,
+        unorderedList: unorderedList || { isActive: false },
+        orderedList: orderedList || { isActive: false },
+      });
     },
     [onChangeState]
   );
@@ -284,6 +306,8 @@ export const EnrichedMarkdownInput = ({
       toggleItalic: () => Commands.toggleItalic(commandRef),
       toggleUnderline: () => Commands.toggleUnderline(commandRef),
       toggleStrikethrough: () => Commands.toggleStrikethrough(commandRef),
+      toggleUnorderedList: () => Commands.toggleUnorderedList(commandRef),
+      toggleOrderedList: () => Commands.toggleOrderedList(commandRef),
       setLink: (url) => Commands.setLink(commandRef, url),
       insertLink: (text, url) => Commands.insertLink(commandRef, text, url),
       removeLink: () => Commands.removeLink(commandRef),
