@@ -714,7 +714,7 @@ using namespace facebook::react;
 
 - (void)toggleListMarkerWithUnordered:(BOOL)unordered
 {
-  NSString *text = [self plainText];
+  NSString *text = ENRMGetPlainText(_textView);
   NSUInteger pos = _textView.selectedRange.location;
 
   // Find line start
@@ -782,7 +782,7 @@ using namespace facebook::react;
   }
 
   NSRange replaceRange = NSMakeRange(lineStart, lineEnd - lineStart);
-  [_textView replaceCharactersInRange:replaceRange withString:newLine];
+  [_textView.textStorage replaceCharactersInRange:replaceRange withString:newLine];
 }
 
 - (void)showLinkPrompt
